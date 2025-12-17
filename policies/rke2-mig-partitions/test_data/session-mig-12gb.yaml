@@ -1,0 +1,11 @@
+- type: Exchange
+  request: |
+    !KubernetesListResourceNamespace
+    api_version: v1
+    kind: ResourceQuota
+    namespace: default
+    label_selector: null
+    field_selector: null
+  response:
+    type: Success
+    payload: '{"apiVersion":"v1","items":[{"apiVersion":"v1","kind":"ResourceQuota","metadata":{"annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"v1\",\"kind\":\"ResourceQuota\",\"metadata\":{\"annotations\":{},\"name\":\"gpu-test\",\"namespace\":\"default\"},\"spec\":{\"hard\":{\"requests.nvidia.com/mig-1g.12gb\":\"1\"}}}\n"},"creationTimestamp":"2025-08-20T15:54:04Z","name":"gpu-test","namespace":"gpu-test","resourceVersion":"12135155","uid":"8ea9f464-5414-4d0e-b80a-8f83eb6dece9"},"spec":{"hard":{"requests.nvidia.com/mig-1g.12gb":"1"}},"status":{"hard":{"requests.nvidia.com/mig-1g.12gb":"1"},"used":{"requests.nvidia.com/mig-1g.12gb":"0"}}}],"kind":"List","metadata":{"resourceVersion":""}}'

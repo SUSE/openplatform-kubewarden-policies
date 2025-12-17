@@ -1,0 +1,11 @@
+- type: Exchange
+  request: |
+    !KubernetesListResourceNamespace
+    api_version: v1
+    kind: ResourceQuota
+    namespace: default
+    label_selector: null
+    field_selector: null
+  response:
+    type: Success
+    payload: '{"apiVersion":"v1","items":[],"kind":"List","metadata":{"resourceVersion":""}}'
