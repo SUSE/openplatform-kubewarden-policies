@@ -1,0 +1,49 @@
+name: Continuous integration
+on:
+  workflow_dispatch:
+  pull_request:
+  schedule:
+    - cron: "0 21 * * *"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  calculate-policy-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      policy_working_dirs: ${{ steps.calculate-policy-dirs.outputs.policy_working_dirs }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # checkout all history to do git diff
+      - name: calculate which policies need a CI job
+        id: calculate-policy-dirs
+        shell: bash
+        run: |
+          git remote -v
+
+          policies_working_dirs=($(find policies -maxdepth 2 -name Makefile -exec dirname '{}' \;))
+          if [ "${{github.event_name}}" == "pull_request" ]; then
+            # list only changes of files in `policies/`:
+            git_files="$(git diff --no-color --find-renames --find-copies --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- policies)"
+
+            # build policy_working_dirs:
+            policies_working_dirs=($(echo "$git_files" | cut -d/ -f1,2 ))
+          fi
+
+          declare -p policies_working_dirs # for debug
+          policy_working_dirs=$(jq --compact-output --null-input '$ARGS.positional | map(select(. != "policies/Cargo.lock" and . != "policies/Cargo.toml" and . != "policies/go.mod" and . != "policies/go.sum")) | unique' --args -- "${policies_working_dirs[@]}")
+          echo "policy_working_dirs=$policy_working_dirs"
+          echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
+
+  continuos-integration:
+    uses: ./.github/workflows/reusable-ci.yaml
+    needs: calculate-policy-matrix
+    if: ${{ needs.calculate-policy-matrix.outputs.policy_working_dirs != '[]' }}
+    strategy:
+      matrix:
+        policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
+    with:
+      policy-working-dir: ${{ matrix.policy-working-dir }}

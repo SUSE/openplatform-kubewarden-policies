@@ -1,0 +1,11 @@
+{
+  "gatewayRestrictions": {
+	"gateway-02": {
+	  "ns-02":[{
+		"hostnames":["host-a.com"],
+		"destination_hosts":[
+		  "service-a.ns-01.svc.cluster.local"]
+	  }]
+	}
+  }
+}

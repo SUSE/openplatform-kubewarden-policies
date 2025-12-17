@@ -1,0 +1,78 @@
+on:
+  workflow_call:
+    inputs:
+      policy-working-dir:
+        description: "Working directory of the policy. Useful for repos with policies in folders"
+        required: false
+        type: string
+        default: "."
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version: "1.25"
+      - uses: golangci/golangci-lint-action@0a35821d5c230e903fcfe077583637dea1b27b47 # v9.0.0
+        with:
+          version: "latest"
+          install-only: true
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Policy linter
+        shell: bash
+        run: |
+          make -C ${{ inputs.policy-working-dir}} lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version: "1.25"
+      - uses: golangci/golangci-lint-action@0a35821d5c230e903fcfe077583637dea1b27b47 # v9.0.0
+        with:
+          version: "latest"
+          install-only: true
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Build policy
+        shell: bash
+        run: |
+          make -C ${{ inputs.policy-working-dir}} policy.wasm
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version: "1.25"
+      - uses: golangci/golangci-lint-action@0a35821d5c230e903fcfe077583637dea1b27b47 # v9.0.0
+        with:
+          version: "latest"
+          install-only: true
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Policy unit tests
+        shell: bash
+        run: |
+          make -C ${{ inputs.policy-working-dir}} test
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version: "1.25"
+      - uses: golangci/golangci-lint-action@0a35821d5c230e903fcfe077583637dea1b27b47 # v9.0.0
+        with:
+          version: "latest"
+          install-only: true
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Policy integration test
+        shell: bash
+        run: |
+          make -C ${{ inputs.policy-working-dir}} e2e-tests

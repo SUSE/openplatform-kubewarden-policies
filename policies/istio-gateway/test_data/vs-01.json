@@ -1,0 +1,44 @@
+{
+  "uid": "d2ea4900-791a-46ad-9078-d995794bdf1f",
+  "kind": {
+    "group": "",
+    "version": "v1",
+    "kind": "VirtualService"
+  },
+
+  "resource": {
+    "group": "",
+    "version": "v1",
+    "resource": "virtualservices"
+  },
+  "operation": "CREATE",
+
+  "userInfo": {
+    "username": "kubernetes-admin",
+    "groups": ["system:masters", "system:authenticated"]
+  },
+  "object": {
+    "apiVersion": "networking.istio.io/v1beta1",
+    "kind": "VirtualService",
+    "metadata": {
+      "name": "test-vs-01",
+      "namespace": "ns-01"
+    },
+    "spec": {
+      "gateways": ["gateway-01"],
+      "hosts": ["host-a.com", "host-b.com"],
+      "http": [
+        {
+          "route": [
+            {
+              "destination": {
+                "host": "some-external-service",
+                "port": { "number": 80 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

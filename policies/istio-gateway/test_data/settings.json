@@ -1,0 +1,32 @@
+{
+  "gatewayRestrictions": {
+    "gateway-01": {
+      "ns-01": [
+        {
+          "hostnames": ["host-a.com","host-b.com"],
+          "destination_hosts": ["*"]
+        }
+      ],
+      "ns-02": [
+        {
+          "hostnames": ["host-c.com"],
+          "destination_hosts": ["*"]
+        }
+      ]
+    },
+    "gateway-02": {
+      "ns-04": [
+        {
+          "hostnames": ["host-c.com"],
+          "destination_hosts": ["*"]
+        }
+      ],
+      "ns-05": [
+        {
+          "hostnames": ["host-d.com"],
+          "destination_hosts": ["*"]
+        }
+      ]
+    }
+  }
+}

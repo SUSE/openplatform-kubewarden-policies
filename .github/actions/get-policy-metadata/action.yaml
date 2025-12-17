@@ -1,0 +1,67 @@
+name: "Get policy information"
+branding:
+  icon: "package"
+  color: "blue"
+inputs:
+  policy-working-dir:
+    description: "Policy folder"
+    required: true
+    type: string
+outputs:
+  policy-id:
+    description: "Policy ID extract from the policy OCI URL"
+    value: ${{ steps.policy-info.outputs.policy-id}}
+  policy-rust-package:
+    description: "Rust package name from Cargo.toml"
+    value: ${{ steps.policy-info.outputs.policy-rust-package}}
+  policy-language:
+    description: "Policy programming language detected"
+    value: ${{ steps.policy-info.outputs.policy-language}}
+  policy-version:
+    description: "Policy version from the metadata.yaml"
+    value: ${{ steps.policy-info.outputs.policy-version}}
+  policy-basename:
+    description: "Policy directory basename"
+    value: ${{ steps.policy-info.outputs.policy-basename}}
+runs:
+  using: "composite"
+  steps:
+    - name: Get policy info
+      shell: bash
+      id: policy-info
+      run: |
+        if [ ! -d "${{ inputs.policy-working-dir }}" ]; then
+          echo "$policy_working_dir does not exist, policy not found";
+          exit 1;
+        fi
+
+        policy_ociUrl=$(yq -r '.annotations."io.kubewarden.policy.ociUrl"' '${{ inputs.policy-working-dir}}/metadata.yml')
+        policy_version=$(yq -r '.annotations."io.kubewarden.policy.version"' '${{ inputs.policy-working-dir}}/metadata.yml')
+        policy_id=${policy_ociUrl##*/}
+        policy_basename=$(basename ${{inputs.policy-working-dir}})
+        policy_language=""
+        policy_rust_package=""
+
+        if [ -f '${{ inputs.policy-working-dir}}/Cargo.toml' ]; then
+          policy_language="rust"
+          policy_rust_package=$(sed  -n 's,^name = \"\(.*\)\",\1,p' "${{ inputs.policy-working-dir}}/Cargo.toml")
+          if [ '$policy_rust_package' == "" ]; then
+            echo 'cannot get rust policy ${{ inputs.policy-working-dir }} package name';
+            exit 1;
+          fi
+        else
+          # Currently this repository supports go and rust policies only
+          policy_language="go"
+        fi
+
+        echo "policy_language=$policy_language"
+        echo "policy_rust_package=$policy_rust_package"
+        echo "policy-id=$policy_id"
+        echo "policy-version=$policy_version"
+        echo "policy-basename=$policy_basename"
+
+        echo "policy-language=$policy_language" >> $GITHUB_OUTPUT
+        echo "policy-rust-package=$policy_rust_package" >> $GITHUB_OUTPUT
+        echo "policy-id=$policy_id" >> $GITHUB_OUTPUT
+        echo "policy-version=$policy_version" >> $GITHUB_OUTPUT
+        echo "policy-basename=$policy_basename" >> $GITHUB_OUTPUT

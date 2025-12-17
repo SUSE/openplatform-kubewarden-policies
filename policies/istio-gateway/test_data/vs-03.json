@@ -1,0 +1,65 @@
+{
+  "uid": "d2ea4900-791a-46ad-9078-d995794bdf1f",
+  "kind": {
+    "group": "",
+    "version": "v1",
+    "kind": "VirtualService"
+  },
+  "resource": {
+    "group": "",
+    "version": "v1",
+    "resource": "virtualservices"
+  },
+  "operation": "CREATE",
+  "userInfo": {
+    "username": "kubernetes-admin",
+    "groups": ["system:masters", "system:authenticated"]
+  },
+  "object": {
+    "apiVersion": "networking.istio.io/v1beta1",
+    "kind": "VirtualService",
+    "metadata": {
+      "name": "test-vs-01",
+      "namespace": "ns-01"
+    },
+    "spec": {
+      "gateways": ["gateway-02"],
+      "hosts": ["host-a.com", "unauthorized-host.com"],
+      "http": [
+        {
+          "comment": "A simple route to one service",
+          "route": [
+            {
+              "destination": {
+                "host": "service-a.ns-01.svc.cluster.local"
+              }
+            }
+          ]
+        },
+        {
+          "comment": "A canary route to two services, one of which is unauthorized",
+          "route": [
+            {
+              "destination": {
+                "host": "service-b.ns-01.svc.cluster.local"
+              },
+              "weight": 90
+            },
+            {
+              "destination": {
+                "host": "unauthorized-service.ns-01.svc.cluster.local"
+              },
+              "weight": 10
+            }
+          ]
+        },
+        {
+          "comment": "A redirect, which has no route/destination block",
+          "redirect": {
+            "uri": "/new-path"
+          }
+        }
+      ]
+    }
+  }
+}

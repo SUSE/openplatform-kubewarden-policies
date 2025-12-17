@@ -1,4 +1,5 @@
 qodana.yaml
+.github/workflows/qodana_code_quality.yml
 
 ### VisualStudioCode template
 .vscode/*
