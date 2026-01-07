@@ -1,0 +1,8 @@
+{
+  "namespaceNetworkBindings": [
+    {
+      "namespace": "test-restricted-namespace-1",
+      "network": "test-restricted-network-1"
+    }
+  ]
+}

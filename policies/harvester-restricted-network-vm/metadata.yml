@@ -1,7 +1,7 @@
 rules:
-- apiGroups: ["k8s.cni.cncf.io"]
+- apiGroups: ["kubevirt.io"]
   apiVersions: ["v1"]
-  resources: ["network-attachment-definitions"]
+  resources: ["VirtualMachine"]
   operations: ["CREATE", "UPDATE"]
 mutating: false
 contextAware: false
@@ -13,8 +13,8 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # kubewarden specific:
-  io.kubewarden.policy.title: harvester-restricted-network
-  io.kubewarden.policy.description: Prevents harvester from creating a network for a restricted VLAN in unauthorized namespaces.
+  io.kubewarden.policy.title: harvester-restricted-network-vm
+  io.kubewarden.policy.description: Ensure harvester only creates a VM with a specified network within in a restricted namespace.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"
   io.kubewarden.policy.url: https://github.github.com/SUSE/openplatform-kubewarden-policies
   io.kubewarden.policy.source: https://github.github.com/SUSE/openplatform-kubewarden-policies
