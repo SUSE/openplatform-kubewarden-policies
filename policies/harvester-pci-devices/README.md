@@ -8,7 +8,7 @@ This policy guards against VMs attaching PCI Devices (e.g., GPUs) without permis
 apiVersion: policies.kubewarden.io/v1
 kind: ClusterAdmissionPolicy
 metadata:
-  name: cc-policy-1
+  name: harvester-pci-policy-1
 spec:
   module: harbor.op-prg2-0-dev-ingress.op.suse.org/op-portal/kubewarden-policy:20
   rules:

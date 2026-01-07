@@ -1,0 +1,8 @@
+{
+  "namespaceVLANBindings": [
+    {
+      "namespace": "test-restricted-namespace-1",
+      "vlan": 42
+    }
+  ]
+}

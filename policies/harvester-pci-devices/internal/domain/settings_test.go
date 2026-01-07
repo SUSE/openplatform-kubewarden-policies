@@ -141,8 +141,8 @@ func TestNewSettingsFromValidationReq(t *testing.T) {
 	settingsJSON := []byte(`{
 		"namespaceDeviceBindings": [
 		{
-			"namespace": "test-cc-namespace-1",
-			"device": "test-cc-device-1"
+			"namespace": "test-restricted-namespace-1",
+			"device": "test-restricted-device-1"
 		}
 		]
 	}`)
@@ -153,5 +153,5 @@ func TestNewSettingsFromValidationReq(t *testing.T) {
 
 	newSettings, err := domain.NewSettingsFromValidationReq(validationRequest)
 	require.NoError(t, err)
-	assert.Equal(t, "test-cc-namespace-1", newSettings.NamespaceDeviceBindings[0].Namespace)
+	assert.Equal(t, "test-restricted-namespace-1", newSettings.NamespaceDeviceBindings[0].Namespace)
 }

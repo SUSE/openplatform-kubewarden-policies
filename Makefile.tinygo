@@ -1,6 +1,6 @@
 ROOT_DIR ?= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 BIN_DIR := $(abspath $(ROOT_DIR)/bin)
-POLICY_DIR := $(dir $(patsubst %/,%,$(CURDIR)))
+POLICY_DIR := $(notdir $(patsubst %/,%,$(CURDIR)))
 
 GOLANGCI_LINT_VER := v2.5.0
 GOLANGCI_LINT_BIN := golangci-lint
@@ -14,8 +14,9 @@ ifeq ($(CI),true)
 else
 	podman run \
 		--rm \
+		--user $(id -u):$(id -g) \
 		-e GOFLAGS="-buildvcs=false" \
-		-v ${POLICY_DIR}:/src:rw,Z \
+		-v ${CURDIR}:/src:rw,Z \
 		-w /src tinygo/tinygo:0.39.0 \
 		tinygo build -o policy.wasm -target=wasi -no-debug ./cmd
 endif
