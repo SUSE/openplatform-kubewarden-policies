@@ -1,0 +1,8 @@
+{
+  "namespaceDeviceBindings": [
+    {
+      "namespace": "test-namespace-1",
+      "device": "test-gpu"
+    }
+  ]
+}

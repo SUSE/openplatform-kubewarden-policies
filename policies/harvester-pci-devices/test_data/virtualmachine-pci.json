@@ -1,0 +1,57 @@
+{
+  "uid": "1299d386-525b-4032-98ae-1949f69f9cfc",
+  "kind": {
+    "group": "kubevirt.io",
+    "kind": "VirtualMachine",
+    "version": "v1"
+  },
+  "resource": {
+    "group": "kubevirt.io",
+    "version": "v1",
+    "resource": "virtualmachines"
+  },
+  "requestKind": {
+    "group": "kubevirt.io",
+    "version": "v1",
+    "kind": "VirtualMachine"
+  },
+  "requestResource": {
+    "group": "",
+    "version": "v1",
+    "resource": "virtualmachines"
+  },
+  "name": "test",
+  "namespace": "default",
+  "operation": "CREATE",
+  "userInfo": {
+    "username": "kubernetes-admin",
+    "groups": [
+      "system:masters",
+      "system:authenticated"
+    ]
+  },
+  "object": {
+    "apiVersion": "v1",
+    "kind": "VirtualMachine",
+    "metadata": {
+      "name": "test-vm",
+      "namespace": "default"
+    },
+    "spec": {
+      "template": {
+        "spec": {
+          "domain": {
+            "devices": {
+              "hostDevices": [
+                {
+                  "deviceName": "nvidia.com/NVIDIA_A2-16Q",
+                  "name": "tekton27a-000001010"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+ROOT_DIR ?= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+BIN_DIR := $(abspath $(ROOT_DIR)/bin)
+POLICY_DIR := $(dir $(patsubst %/,%,$(CURDIR)))
+
+GOLANGCI_LINT_VER := v2.5.0
+GOLANGCI_LINT_BIN := golangci-lint
+GOLANGCI_LINT := $(BIN_DIR)/$(GOLANGCI_LINT_BIN)
+
+policy.wasm:
+	GOOS=wasip1 GOARCH=wasm go build -gcflags=all="-B" -ldflags="-w -s" -o policy.wasm ./cmd
+	wasm-opt --enable-bulk-memory -Oz -o policy.wasm policy.wasm
+
+annotated-policy.wasm: policy.wasm metadata.yml
+	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
+
+.PHONY: test
+test:
+	go test -v ./internal/...
+
+.PHONY: e2e-tests
+e2e-tests: annotated-policy.wasm
+	bats e2e.bats
+
+golangci-lint: $(GOLANGCI_LINT) ## Install a local copy of golang ci-lint.
+$(GOLANGCI_LINT): ## Install golangci-lint.
+	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VER)
+
+.PHONY: lint
+lint: $(GOLANGCI_LINT)
+	go vet ./...
+	$(GOLANGCI_LINT) run --config $(ROOT_DIR).golangci.yml
+
+.PHONY: lint-fix
+lint-fix: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run --fix --config $(ROOT_DIR).golangci.yml
+
+.PHONY: clean
+clean:
+	go clean
+	rm -f policy.wasm annotated-policy.wasm
+
+.PHONY: debug
+debug:
+	@echo $(MAKEFILE_LIST)
+	@echo "ROOT_DIR=$(ROOT_DIR)"
+	@echo "ROOT_DIR2:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))"
+	@echo "CURDIR=$(CURDIR)"
+	@echo "POLICY_DIR=$(POLICY_DIR)"

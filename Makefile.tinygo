@@ -1,0 +1,59 @@
+ROOT_DIR ?= $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+BIN_DIR := $(abspath $(ROOT_DIR)/bin)
+POLICY_DIR := $(dir $(patsubst %/,%,$(CURDIR)))
+
+GOLANGCI_LINT_VER := v2.5.0
+GOLANGCI_LINT_BIN := golangci-lint
+GOLANGCI_LINT := $(BIN_DIR)/$(GOLANGCI_LINT_BIN)
+
+policy.wasm:
+# CI is a environment variable set in the GitHub Actions workflow.
+# If we are running in CI, we assume TinyGo is already installed.
+ifeq ($(CI),true)
+	tinygo build -o policy.wasm -target=wasi -no-debug ./cmd
+else
+	podman run \
+		--rm \
+		-e GOFLAGS="-buildvcs=false" \
+		-v ${POLICY_DIR}:/src:rw,Z \
+		-w /src tinygo/tinygo:0.39.0 \
+		tinygo build -o policy.wasm -target=wasi -no-debug ./cmd
+endif
+
+
+annotated-policy.wasm: policy.wasm
+	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
+
+.PHONY: test
+test:
+	go test -v ./internal/...
+
+.PHONY: e2e-tests
+e2e-tests: annotated-policy.wasm
+	bats e2e.bats
+
+golangci-lint: $(GOLANGCI_LINT) ## Install a local copy of golang ci-lint.
+$(GOLANGCI_LINT): ## Install golangci-lint.
+	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VER)
+
+.PHONY: lint
+lint: $(GOLANGCI_LINT)
+	go vet ./...
+	$(GOLANGCI_LINT) run --config $(ROOT_DIR).golangci.yml
+
+.PHONY: lint-fix
+lint-fix: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run --fix --config $(ROOT_DIR).golangci.yml
+
+.PHONY: clean
+clean:
+	go clean
+	rm -f policy.wasm annotated-policy.wasm
+
+.PHONY: debug
+debug:
+	@echo $(MAKEFILE_LIST)
+	@echo "ROOT_DIR=$(ROOT_DIR)"
+	@echo "ROOT_DIR2:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))"
+	@echo "CURDIR=$(CURDIR)"
+	@echo "POLICY_DIR=$(POLICY_DIR)"
