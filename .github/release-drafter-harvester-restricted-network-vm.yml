@@ -1,0 +1,6 @@
+_extends: openplatform-kubewarden-policies:.github/release-drafter.yml
+name-template: "harvester-restricted-network-vm/v$RESOLVED_VERSION"
+tag-template: "harvester-restricted-network-vm/v$RESOLVED_VERSION"
+tag-prefix: harvester-restricted-network-vm/v
+include-paths:
+  - "policies/harvester-restricted-network-vm/"

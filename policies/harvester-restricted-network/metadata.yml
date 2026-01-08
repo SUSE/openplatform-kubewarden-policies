@@ -13,6 +13,7 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # kubewarden specific:
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.title: harvester-restricted-network
   io.kubewarden.policy.description: Prevents harvester from creating a network for a restricted VLAN in unauthorized namespaces.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"
