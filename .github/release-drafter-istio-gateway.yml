@@ -1,0 +1,6 @@
+_extends: openplatform-kubewarden-policies:.github/_release-drafter.yml
+name-template: "istio-gateway/v$RESOLVED_VERSION"
+tag-template: "istio-gateway/v$RESOLVED_VERSION"
+tag-prefix: istio-gateway/v
+include-paths:
+  - "policies/istio-gateway/"

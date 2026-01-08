@@ -1,0 +1,6 @@
+_extends: openplatform-kubewarden-policies:.github/_release-drafter.yml
+name-template: "harvester-pci-devices/v$RESOLVED_VERSION"
+tag-template: "harvester-pci-devices/v$RESOLVED_VERSION"
+tag-prefix: harvester-pci-devices/v
+include-paths:
+  - "policies/harvester-pci-devices/"

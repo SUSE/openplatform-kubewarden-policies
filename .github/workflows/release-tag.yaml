@@ -1,0 +1,122 @@
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+    inputs:
+      policy-working-dir:
+        description: "working directory under policies folder"
+        required: true
+        type: string
+
+name: Tag and Release on PR Merge
+
+jobs:
+  calculate-policy-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      policy_working_dirs: ${{ steps.calculate-policy-working-dirs.outputs.policy_working_dirs }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # checkout all history to do git diff
+      - name: calculate which policies need a CI job
+        id: calculate-policy-working-dirs
+        shell: bash
+        run: |
+          if [ "${{github.event_name}}" == "workflow_dispatch" ]; then
+            dir_bash_array=("${{ inputs.policy-working-dir }}")
+          else
+            git remote -v
+            # list only changes of files in `policies/`:
+            # We compare base and head references to avoid detecting changes merged to close each other.
+            # Otherwise, a job to tag the same policy could be triggered twice.
+            git_files="$(git diff --no-color --find-renames --find-copies --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- policies)"
+
+            # build policy_working_dirs:
+            dir_bash_array=($(echo "$git_files" | cut -d/ -f1,2 ))
+          fi
+          declare -p dir_bash_array
+          policy_working_dirs=$(jq --compact-output --null-input '$ARGS.positional | map(select(. != "policies/Cargo.lock" and . != "policies/Cargo.toml" and . != "policies/go.mod" and . != "policies/go.sum")) | unique' --args -- "${dir_bash_array[@]}")
+          echo "policy_working_dirs=$policy_working_dirs"
+          echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
+
+  release-tag:
+    name: Tag and push, triggering release
+    needs: calculate-policy-matrix
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'TRIGGER-RELEASE') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.policy-working-dir }}
+    strategy:
+      matrix:
+        policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # also checkout tags
+      - name: Extract version from metadata.yml
+        id: extract-version
+        shell: bash
+        run: |
+          POLICY_DIR="${{ matrix.policy-working-dir }}"
+          POLICY_NAME=""
+          FILES=("metadata.yml" "metadata.yaml")
+          VERSION=""
+          for F in "${FILES[@]}"; do
+            FILE="$F"
+            if [ -n "$POLICY_DIR" ]; then
+              if [ -f "$POLICY_DIR" ]; then
+                echo "The policy directory does not exists: $POLICY_DIR"
+                exit 1
+              fi
+              FILE="$POLICY_DIR/$F"
+              # policy dir can have multiple directories. Assume the last one
+              # to be the policy-name
+              POLICY_NAME="$(basename $POLICY_DIR)"
+            fi
+            if [ -f "$FILE" ]; then
+              VERSION="v$(yq e '.annotations."io.kubewarden.policy.version"' $FILE)"
+              if [ -z "$VERSION" ]; then
+                echo "annotation 'io.kubewarden.policy.version' is missing in $FILE"
+                exit 1
+              fi
+              if  [ -n "$POLICY_NAME" ]; then
+                VERSION="$POLICY_NAME/$VERSION"
+              fi
+              echo "found version $VERSION"
+              echo "VERSION=$VERSION" >> $GITHUB_ENV
+              exit 0
+            fi
+          done
+          echo "Error: metadata.yml or metadata.yaml not found" >&2
+          exit 1
+
+      - name: Configure Git author
+        run: |
+          git config user.name "Kubewarden bot"
+          git config user.email "cncf-kubewarden-maintainers@lists.cncf.io"
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -a "$VERSION" -m "Release version $VERSION"
+          git push origin "$VERSION"
+
+      - name: Trigger release workflow
+        run: gh workflow run release.yml --ref "$VERSION"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Delete branch corresponding to the PR
+        if: github.event.pull_request.head.ref != 'main'
+        run: |
+          git push origin --delete ${{ github.event.pull_request.head.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
