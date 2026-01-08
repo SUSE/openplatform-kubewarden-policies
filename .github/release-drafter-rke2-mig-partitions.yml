@@ -1,0 +1,6 @@
+_extends: openplatform-kubewarden-policies:.github/release-drafter.yml
+name-template: "rke2-mig-partitions/v$RESOLVED_VERSION"
+tag-template: "rke2-mig-partitions/v$RESOLVED_VERSION"
+tag-prefix: rke2-mig-partitions/v
+include-paths:
+  - "policies/rke2-mig-partitions/"

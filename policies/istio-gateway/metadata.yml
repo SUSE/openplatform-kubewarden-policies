@@ -15,6 +15,7 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # kubewarden specific:
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.title: policy-istio-gateway
   io.kubewarden.policy.description: Restrict the usage of the `Gateway` object configured on top of a dedicated instance of istio proxy only to `VirtualService` object coming from a set of namespaces.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"

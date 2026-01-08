@@ -15,6 +15,7 @@ executionMode: wasi
 backgroundAudit: true
 annotations:
   # kubewarden specific:
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.title: policy-pod-mig-partitions
   io.kubewarden.policy.description: Prevents assigning mig partitions without a ResourceQuota for them.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"

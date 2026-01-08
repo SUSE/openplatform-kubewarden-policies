@@ -13,6 +13,7 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # kubewarden specific:
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.title: harvester-pci-devices
   io.kubewarden.policy.description: Prevents libvirt from binding pci devices in the wrong namespaces.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"
