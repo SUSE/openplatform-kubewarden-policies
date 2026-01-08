@@ -1,125 +1,67 @@
-name: "kubewarden-policy-gh-action-dependencies"
-description: "Install all the binaries needed inside of GH action"
+name: "Get policy information"
 branding:
   icon: "package"
   color: "blue"
 inputs:
-  KWCTL_VERSION:
-    description: "kwctl release to be installed"
-    required: false
-    default: v1.31.0
-  SYFT_VERSION:
-    description: "syft release to be installed"
-    required: false
-    default: "1.28.0"
-  arch:
-    description: "syft arch to be installed"
-    required: false
-    default: "linux_amd64" # windows_amd64, darwin_amd64
-  BINARYEN_VERSION:
-    description: "binaryen release to be installed"
-    required: false
-    default: "116"
+  policy-working-dir:
+    description: "Policy folder"
+    required: true
+    type: string
+outputs:
+  policy-id:
+    description: "Policy ID extract from the policy OCI URL"
+    value: ${{ steps.policy-info.outputs.policy-id}}
+  policy-rust-package:
+    description: "Rust package name from Cargo.toml"
+    value: ${{ steps.policy-info.outputs.policy-rust-package}}
+  policy-language:
+    description: "Policy programming language detected"
+    value: ${{ steps.policy-info.outputs.policy-language}}
+  policy-version:
+    description: "Policy version from the metadata.yaml"
+    value: ${{ steps.policy-info.outputs.policy-version}}
+  policy-basename:
+    description: "Policy directory basename"
+    value: ${{ steps.policy-info.outputs.policy-basename}}
 runs:
   using: "composite"
   steps:
-    - name: Install cosign
-      uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
-    - name: Install kwctl
+    - name: Get policy info
       shell: bash
+      id: policy-info
       run: |
-        #!/bin/bash
-        set -e
+        if [ ! -d "${{ inputs.policy-working-dir }}" ]; then
+          echo "$policy_working_dir does not exist, policy not found";
+          exit 1;
+        fi
 
-        # Build name of gihub release asset
-        OS=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]' | sed 's/macos/darwin/')
-        ARCH=$(echo "${{ runner.arch }}" | sed -E 's/X64/x86_64/; s/ARM64/aarch64/')
-        ASSET="kwctl-${OS}-${ARCH}"
+        policy_ociUrl=$(yq -r '.annotations."io.kubewarden.policy.ociUrl"' '${{ inputs.policy-working-dir}}/metadata.yml')
+        policy_version=$(yq -r '.annotations."io.kubewarden.policy.version"' '${{ inputs.policy-working-dir}}/metadata.yml')
+        policy_id=${policy_ociUrl##*/}
+        policy_basename=$(basename ${{inputs.policy-working-dir}})
+        policy_language=""
+        policy_rust_package=""
 
-        INSTALL_DIR=$HOME/.kwctl
-        RELEASE_URL="download/${{ inputs.KWCTL_VERSION }}"
-        [ "${{ inputs.KWCTL_VERSION }}" == "latest" ] && RELEASE_URL="latest/download"
+        if [ -f '${{ inputs.policy-working-dir}}/Cargo.toml' ]; then
+          policy_language="rust"
+          policy_rust_package=$(sed  -n 's,^name = \"\(.*\)\",\1,p' "${{ inputs.policy-working-dir}}/Cargo.toml")
+          if [ '$policy_rust_package' == "" ]; then
+            echo 'cannot get rust policy ${{ inputs.policy-working-dir }} package name';
+            exit 1;
+          fi
+        else
+          # Currently this repository supports go and rust policies only
+          policy_language="go"
+        fi
 
-        mkdir -p $INSTALL_DIR
-        curl -sL https://github.com/kubewarden/kwctl/releases/$RELEASE_URL/$ASSET.zip -o $INSTALL_DIR/$ASSET.zip
-        unzip -o $INSTALL_DIR/$ASSET.zip -d $INSTALL_DIR
-        rm $INSTALL_DIR/$ASSET.zip
+        echo "policy_language=$policy_language"
+        echo "policy_rust_package=$policy_rust_package"
+        echo "policy-id=$policy_id"
+        echo "policy-version=$policy_version"
+        echo "policy-basename=$policy_basename"
 
-        mv $INSTALL_DIR/$ASSET $INSTALL_DIR/kwctl
-        chmod 755 $INSTALL_DIR/kwctl
-        echo $INSTALL_DIR >> $GITHUB_PATH
-
-        $INSTALL_DIR/kwctl -V
-    - name: Install bats
-      shell: bash
-      run: sudo apt install -y bats
-    - name: Install SBOM generator tool
-      shell: bash
-      if: ${{ inputs.arch != 'windows_amd64' }}
-      run: |
-        #!/bin/bash
-        set -e
-
-        INSTALL_DIR=$HOME/.syft
-
-        mkdir -p $INSTALL_DIR
-
-        curl -sL https://github.com/anchore/syft/releases/download/v${{ inputs.SYFT_VERSION }}/syft_${{ inputs.SYFT_VERSION }}_${{ inputs.arch }}.tar.gz -o $INSTALL_DIR/syft.tar.gz
-        tar xvf $INSTALL_DIR/syft.tar.gz -C $INSTALL_DIR
-        rm $INSTALL_DIR/syft.tar.gz
-
-        echo $INSTALL_DIR >> $GITHUB_PATH
-
-    - name: Install SBOM generator tool
-      shell: bash
-      if: ${{ inputs.arch == 'windows_amd64' }}
-      run: |
-        #!/bin/bash
-        set -e
-
-        INSTALL_DIR=$HOME/.syft
-
-        mkdir -p $INSTALL_DIR
-
-        curl -sL https://github.com/anchore/syft/releases/download/v${{ inputs.SYFT_VERSION  }}/syft_${{ inputs.SYFT_VERSION }}_windows_amd64.zip -o $INSTALL_DIR/syft.zip
-        unzip -n $INSTALL_DIR/syft.zip -d $INSTALL_DIR
-        rm $INSTALL_DIR/syft.zip
-
-        echo $INSTALL_DIR >> $GITHUB_PATH
-    - name: Install binaryen tool
-      shell: bash
-      run: |
-        #!/bin/bash
-        set -e
-
-        INSTALL_DIR=$HOME/.binaryen
-
-        mkdir -p $INSTALL_DIR
-
-        curl -sL https://github.com/WebAssembly/binaryen/releases/download/version_${{ inputs.BINARYEN_VERSION }}/binaryen-version_${{ inputs.BINARYEN_VERSION }}-x86_64-linux.tar.gz -o $INSTALL_DIR/binaryen.tar.gz
-        tar xvf $INSTALL_DIR/binaryen.tar.gz -C $INSTALL_DIR
-        mv $INSTALL_DIR/binaryen-version_${{ inputs.BINARYEN_VERSION }}/bin/* $INSTALL_DIR
-        rm $INSTALL_DIR/binaryen.tar.gz
-        rm -rf $INSTALL_DIR/binaryen-version_${{ inputs.BINARYEN_VERSION }}
-
-        echo $INSTALL_DIR >> $GITHUB_PATH
-    - name: Setup rust toolchain
-      run: |
-        rustup toolchain install stable  --profile minimal --target wasm32-wasip1
-        rustup override set stable
-      shell: bash
-    - name: Install tinygo
-      shell: bash
-      run: |
-        wget https://github.com/tinygo-org/tinygo/releases/download/v0.39.0/tinygo_0.39.0_amd64.deb
-        sudo dpkg -i tinygo_0.39.0_amd64.deb
-    - name: Install semver tool
-      shell: bash
-      run: |
-        INSTALL_DIR="$HOME"/.semver
-        mkdir -p "$INSTALL_DIR"
-        wget -O "$INSTALL_DIR"/semver https://github.com/fsaintjacques/semver-tool/raw/3.4.0/src/semver
-        chmod +x "$INSTALL_DIR"/semver
-        echo "$INSTALL_DIR" >> "$GITHUB_PATH"
-    - name: Install updatecli
-      uses: updatecli/updatecli-action@719e3592d124cbf826da704cbe557e1221dd4bba # v2.94.0
+        echo "policy-language=$policy_language" >> $GITHUB_OUTPUT
+        echo "policy-rust-package=$policy_rust_package" >> $GITHUB_OUTPUT
+        echo "policy-id=$policy_id" >> $GITHUB_OUTPUT
+        echo "policy-version=$policy_version" >> $GITHUB_OUTPUT
+        echo "policy-basename=$policy_basename" >> $GITHUB_OUTPUT
