@@ -1,0 +1,24 @@
+on:
+  workflow_call:
+    inputs:
+      policy-working-dir:
+        description: "Working directory of the policy. Useful for repos with policies in folders"
+        required: false
+        type: string
+        default: "."
+jobs:
+  auto-labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Get policy metadata
+        id: policy-info
+        uses: ./.github/actions/get-policy-metadata
+        with:
+          policy-working-dir: "${{ inputs.policy-working-dir }}"
+      - uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
+        with:
+          config-name: "release-drafter-${{ steps.policy-info.outputs.policy-basename }}.yml"
+          prerelease: ${{ contains(steps.policy-info.outputs.policy-version, '-alpha') || contains(steps.policy-info.outputs.policy-version, '-beta') || contains(steps.policy-info.outputs.policy-version, '-rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
