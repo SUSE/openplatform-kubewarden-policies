@@ -1,4 +1,4 @@
-module github.com/SUSE/openplatform-kubewarden-policies/policies/rke2-mig-partitions
+module github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions
 
 go 1.22
 
