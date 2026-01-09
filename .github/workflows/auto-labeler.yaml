@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0 # checkout all history to do git diff
       - name: 'Policy Matrix'
         id: policy-matrix
-        uses: ./.github/actions/policy-matrix
+        uses: ./.github/actions/calculate-policy-matrix
   auto_labeler:
     uses: ./.github/workflows/reusable-auto-labeler.yaml
     needs: calculate-policy-matrix
