@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/SUSE/openplatform-kubewarden-policies/policies/rke2-mig-partitions/internal/domain"
+	"github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions/internal/domain"
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 	"github.com/kubewarden/policy-sdk-go/pkg/capabilities"
 	kubewardenProtocol "github.com/kubewarden/policy-sdk-go/protocol"

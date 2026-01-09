@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/SUSE/openplatform-kubewarden-policies/policies/rke2-mig-partitions/internal/domain"
+	"github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions/internal/domain"
 	kubewardenProtocol "github.com/kubewarden/policy-sdk-go/protocol"
 	kubewardenTesting "github.com/kubewarden/policy-sdk-go/testing"
 	"github.com/stretchr/testify/assert"

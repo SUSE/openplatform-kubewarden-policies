@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/SUSE/openplatform-kubewarden-policies/policies/rke2-mig-partitions/internal/domain"
-	"github.com/SUSE/openplatform-kubewarden-policies/policies/rke2-mig-partitions/internal/inbound"
+	"github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions/internal/domain"
+	"github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions/internal/inbound"
 )
 
 func main() {
