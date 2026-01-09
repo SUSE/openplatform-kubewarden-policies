@@ -49,7 +49,7 @@ spec:
 
 Here would be the result of the above policy.
 
-| namespace         | network | Result |
+| namespace         | VLAN ID | Result |
 |-------------------|---------|--------|
 | test-restricted-1 | 42      | ALLOW  |
 | test-restricted-2 | 1337    | ALLOW  |
