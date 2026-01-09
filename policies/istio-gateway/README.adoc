@@ -1,0 +1,100 @@
+image:https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg[Kubewarden Policy Repository, link=https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope]
+image:https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge[Stable, link=https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable]
+
+== istio-gateway
+
+----
+This policy is meant to work with link:https://istio.io/[Istio], but not does not protect resources from its link:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/[Gateway API] implementation.
+----
+
+This policy protects shared Istio Gateway resources by watching changes to VirtualService resources.
+For configured Gateway resources, it will ensure that VirtualService resources are correctly configured.
+
+=== Settings
+
+|===
+| Field | Description
+
+| gatewayRestrictions
+
+map[string, link:#settingsGateway[Gateway]] | A list of Istio Gateway objects to restrict.
+|===
+
+[[settingsGateway]]
+==== Gateway
+
+|===
+| Field | Description
+
+| namespaces
+
+map[string, link:#settingsNamespace[namespace]] | A map of namespace objects.
+|===
+
+[[settingsNamespace]]
+====  Namespace
+
+|===
+| Field | Description
+
+| hostnames
+
+string[] | A list of hostnames for the VirtualService.
+
+| port
+
+int | The port for the VirtualService. The default value 0 means any.
+
+| protocol
+
+string | The protocol for the VirtualService. The default value (empty string) means any.
+
+| destination_hosts
+
+string[] | The destination hosts for the VirtualService.
+|===
+
+=== Specifications
+
+1. You should be able to create a Gateway only on specific namespaces for specific hosts and destination_hosts if defined, otherwise the `*` wildcard will allow `all`.
+2. You should not be able to create a Gateway without specifying a valid namespace.
+
+=== Example
+
+[source, yaml]
+----
+apiVersion: policies.kubewarden.io/v1
+kind: ClusterAdmissionPolicy
+metadata:
+  name: istio-gw-policy-1
+spec:
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway:latest
+  rules:
+    - apiGroups: ["networking.istio.io"]
+      apiVersions: ["v1"]
+      resources: ["virtualservices"]
+      operations: ["CREATE", "UPDATE"]
+  settings:
+    gatewayRestrictions:
+      "gateway01":
+        "ns-1":
+          - hostnames: []
+            destination_hosts: []
+      "gateway02":
+        "ns-2":
+          - hostnames: ["hostname a"]
+            port: "80"
+            protocol: "http"
+            destination_hosts: ["servicename a", "servicename b"]
+          - hostnames: ["hostname b"]
+            port: "443"
+            protocol: "https"
+            destination_hosts: ["servicename a", "servicename c"]
+        "ns-3":
+          - hostnames: ["hostname c"]
+            port: "443"
+            protocol: "https"
+            destination_hosts: []
+  mutating: false
+  policyServer: default
+----

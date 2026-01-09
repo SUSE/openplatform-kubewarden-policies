@@ -33,12 +33,6 @@ autolabeler:
   # Tag any PR with "!" in the subject as major update. In other words, breaking change
   - label: "kind/breaking-change"
     title: "/.*!:.*/"
-  - label: "area/dependencies"
-    title: "chore(deps)"
-  - label: "area/dependencies"
-    title: "fix(deps)"
-  - label: "area/dependencies"
-    title: "build(deps)"
   - label: "kind/feature"
     title: "feat"
   - label: "kind/bug"
