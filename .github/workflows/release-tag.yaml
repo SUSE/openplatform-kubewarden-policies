@@ -1,0 +1,91 @@
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+    inputs:
+      policy-working-dir:
+        description: "working directory under policies folder"
+        required: true
+        type: string
+
+name: Tag and Release on PR Merge
+
+jobs:
+  calculate-policy-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      policy_working_dirs: ${{ steps.calculate-policy-working-dirs.outputs.policy_working_dirs }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # checkout all history to do git diff
+      - name: 'Calculate which policies need a CI job'
+        id: calculate-policy-working-dirs
+        shell: bash
+        run: |
+          if [ "${{github.event_name}}" == "workflow_dispatch" ]; then
+            dir_bash_array=("${{ inputs.policy-working-dir }}")
+          else
+            git remote -v
+            # list only changes of files in `policies/`:
+            # We compare base and head references to avoid detecting changes merged to close each other.
+            # Otherwise, a job to tag the same policy could be triggered twice.
+            git_files="$(git diff --no-color --find-renames --find-copies --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- policies)"
+
+            # build policy_working_dirs:
+            dir_bash_array=($(echo "$git_files" | cut -d/ -f1,2 ))
+          fi
+
+          declare -p dir_bash_array
+          policy_working_dirs=$(jq --compact-output --null-input '$ARGS.positional | map(select(. != "policies/Cargo.lock" and . != "policies/Cargo.toml" and . != "policies/go.mod" and . != "policies/go.sum")) | unique' --args -- "${dir_bash_array[@]}")
+          echo "policy_working_dirs=$policy_working_dirs"
+          echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
+  release-tag:
+    name: Tag and push, triggering release
+    needs: calculate-policy-matrix
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'TRIGGER-RELEASE') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.policy-working-dir }}
+    strategy:
+      matrix:
+        policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # also checkout tags
+
+      - name: Get policy metadata
+        id: policy-info
+        uses: ./.github/actions/get-policy-metadata
+        with:
+          policy-working-dir: "${{ matrix.policy-working-dir }}"
+
+      - name: Extract version
+        id: extract-version
+        shell: bash
+        run: |
+          VERSION="${{ steps.policy-info.outputs.policy-basename }}/v${{ steps.policy-info.outputs.policy-version }}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Configure Git author
+        run: |
+          git config user.name "Kubewarden bot"
+          git config user.email "itpe-core-maintenance@suse.com"
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag -a "$VERSION" -m "Release version $VERSION"
+          git push origin "$VERSION"
+
+      - name: Trigger release workflow
+        run: gh workflow run release.yaml --ref "$VERSION"
+        env:
+          GH_TOKEN: ${{ github.token }}

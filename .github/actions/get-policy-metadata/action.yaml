@@ -6,7 +6,6 @@ inputs:
   policy-working-dir:
     description: "Policy folder"
     required: true
-    type: string
 outputs:
   policy-id:
     description: "Policy ID extract from the policy OCI URL"
@@ -35,8 +34,8 @@ runs:
           exit 1;
         fi
 
-        policy_ociUrl=$(yq -r '.annotations."io.kubewarden.policy.ociUrl"' '${{ inputs.policy-working-dir}}/metadata.yml')
-        policy_version=$(yq -r '.annotations."io.kubewarden.policy.version"' '${{ inputs.policy-working-dir}}/metadata.yml')
+        policy_ociUrl=$(yq -r '.annotations."io.kubewarden.policy.ociUrl"' '${{ inputs.policy-working-dir }}/metadata.yml')
+        policy_version=$(yq -r '.annotations."io.kubewarden.policy.version"' '${{ inputs.policy-working-dir }}/metadata.yml')
         policy_id=${policy_ociUrl##*/}
         policy_basename=$(basename ${{inputs.policy-working-dir}})
         policy_language=""
@@ -44,7 +43,7 @@ runs:
 
         if [ -f '${{ inputs.policy-working-dir}}/Cargo.toml' ]; then
           policy_language="rust"
-          policy_rust_package=$(sed  -n 's,^name = \"\(.*\)\",\1,p' "${{ inputs.policy-working-dir}}/Cargo.toml")
+          policy_rust_package=$(sed  -n 's,^name = \"\(.*\)\",\1,p' "${{ inputs.policy-working-dir }}/Cargo.toml")
           if [ '$policy_rust_package' == "" ]; then
             echo 'cannot get rust policy ${{ inputs.policy-working-dir }} package name';
             exit 1;
