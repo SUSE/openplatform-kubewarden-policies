@@ -41,7 +41,12 @@ jobs:
       - name: Build policy
         shell: bash
         run: |
+          set -ex
           make -C ${{ inputs.policy-working-dir}} policy.wasm
+          make -C ${{ inputs.policy-working-dir}} annotated-policy.wasm
+          
+          echo Pushing :latest policy to OCI container registry
+          kwctl push -o json ${{ inputs.policy-working-dir}}/annotated-policy.wasm ghcr.io/${{ github.repository_owner }}/openplatform-kubewarden-policies/harvester-pci-devices:latest
   unit-test:
     runs-on: ubuntu-latest
     steps:
