@@ -1,0 +1,50 @@
+name: "kubewarden-check-artifacthub"
+description: "Push artifacthub files to artifacthub branch"
+branding:
+  icon: "package"
+  color: "blue"
+inputs:
+  policy-working-dir:
+    description: "working directory of the policy. Useful for repos with policies in folders"
+    required: true
+  version:
+    description: "The version of the policy"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      with:
+        fetch-depth: 0 # fetch all history for all branches and tags
+    - name: generate artifacthub-pkg.yml
+      shell: bash
+      working-directory: ${{ inputs.policy-working-dir }}
+      run: |
+        kwctl scaffold artifacthub --output ${{ runner.temp }}/artifacthub-pkg.yml
+    - name: Push up-to-date artifacthub-pkg.yml
+      shell: bash
+      run: |
+        set -x
+        git config user.name "Update artifacthub branch"
+        git config user.email github-actions@github.com
+
+        git checkout -b main --track origin/main
+        git checkout -b artifacthub --track origin/artifacthub || git checkout --orphan artifacthub
+        git reset HEAD -- .
+
+        export POLICY_DIRECTORY="${{ inputs.policy-working-dir }}/${{ inputs.version }}"
+
+        # Create or update files
+        git checkout ${{ github.ref_name }} -- artifacthub-repo.yml
+        mkdir -p $POLICY_DIRECTORY
+        mv ${{ runner.temp }}/artifacthub-pkg.yml $POLICY_DIRECTORY/artifacthub-pkg.yml
+        git show ${{ github.ref_name }}:${{ inputs.policy-working-dir }}/README.md > $POLICY_DIRECTORY/README.md
+
+        # Add changes to Git
+        git add artifacthub-repo.yml
+        git add $POLICY_DIRECTORY/artifacthub-pkg.yml
+        git add $POLICY_DIRECTORY/README.md
+
+        git commit -m "Bump ArtifactHub files for ${{ inputs.policy-working-dir }}, version ${{ inputs.version }}"
+        git push origin artifacthub

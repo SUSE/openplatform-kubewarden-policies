@@ -1,49 +1,64 @@
-# harvester-restricted-netwok
+[![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
+[![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
+
+# harvester-restricted-network
 
 This policy guards against harvester creating a network for a restricted VLAN in unauthorized namespaces.
 
-**Example policy:**
+## Settings
 
-```
-apiVersion: policies.kubewarden.io/v1
-kind: ClusterAdmissionPolicy
-metadata:
-  name: restricted-vlan-policy-1
-spec:
-  module: harvester-restricted-network:0.1.0
-  rules:
-    - apiGroups: ["k8s.cni.cncf.io"]
-      apiVersions: ["v1"]
-      resources: ["network-attachment-definitions"]
-      operations: ["CREATE", "UPDATE"]
-  settings:
-    namespaceVLANBindings:
-      - namespace:  test-restricted-1-network-1
-        vlan:       42
-      - namespace:  test-restricted-2-network-1
-        vlan:       1337
-  mutating: false  # or true if your policy mutates resources
-  policyServer: default
-```
+| Field                                                                                 | Description                       |
+|---------------------------------------------------------------------------------------|-----------------------------------|
+| namespaceVLANBindings <br> map[string, [NamespaceVLANBinding](#namespaceVLANBinding)] | A map of namespace VLAN bindings. |
 
-**Specifications:**
+### NamespaceVLANBinding
+
+| Field                  | Description                            |
+|------------------------|----------------------------------------|
+| namespace <br/> string | The namespace.                         |
+| vlan <br/> int         | The VLAN for the Harvester VM Network. |
+
+
+## Specifications
 
 1. All bound namespaces must use their respective bound VLANs.
 2. All bound VLANs must use their respective bound namespaces.
 3. Any namespace or VLAN that isn't bound, is unrestricted.
 
-**Examples:**
+## Example
+
+```yaml
+apiVersion: policies.kubewarden.io/v1
+kind: ClusterAdmissionPolicy
+metadata:
+  name: restricted-network-policy-1
+spec:
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/harvester-restricted-network:latest
+  rules:
+    - apiGroups: ["kubevirt.io"]
+      apiVersions: ["v1"]
+      resources: ["virtualmachines"]
+      operations: ["CREATE", "UPDATE"]
+  settings:
+    namespaceVLANBindings:
+      - namespace:  test-restricted-1
+        vlan:       42
+      - namespace:  test-restricted-2
+        vlan:       1337
+  mutating: false
+  policyServer: default
+```
 
 The following examples are with the example policy above, with a random non-restricted VLAN being 100.
 
-| namespace                   | network | Result |
-|-----------------------------|---------|--------|
-| test-restricted-1-network-1 | 42      | ALLOW  |
-| test-restricted-2-network-1 | 1337    | ALLOW  |
-| random-namespace            | 100     | ALLOW  |
-| test-restricted-1-network-1 | 1337    | REJECT |
-| test-restricted-2-network-2 | 42      | REJECT |
-| random-namespace            | 42      | REJECT |
-| random-namespace            | 1337    | REJECT |
-| test-restricted-1-network-1 | 100     | REJECT |
-| test-restricted-2-network-2 | 100     | REJECT |
+| Namespace         | VLAN ID | Result |
+|-------------------|---------|--------|
+| test-restricted-1 | 42      | ALLOW  |
+| test-restricted-2 | 1337    | ALLOW  |
+| random-namespace  | 100     | ALLOW  |
+| test-restricted-1 | 1337    | REJECT |
+| test-restricted-2 | 42      | REJECT |
+| random-namespace  | 42      | REJECT |
+| random-namespace  | 1337    | REJECT |
+| test-restricted-1 | 100     | REJECT |
+| test-restricted-2 | 100     | REJECT |

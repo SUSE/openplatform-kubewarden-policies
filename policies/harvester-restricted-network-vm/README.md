@@ -1,23 +1,45 @@
+[![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
+[![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
+
 # harvester-restricted-network-vm
 
-This policy guards against VMs being deployed into protected network segments.
+This policy protects Harvester VM networks, by specifying which namespaces are allowed.
 
-**Example policy:**
+## Settings
 
-```
+| Field                                                                                          | Description                          |
+|------------------------------------------------------------------------------------------------|--------------------------------------|
+| namespaceNetworkBindings <br> map[string, [NamespaceNetworkBinding](#namespaceNetworkBinding)] | A map of namespace network bindings. |
+
+### NamespaceNetworkBinding
+
+| Field                  | Description                                                      |
+|------------------------|------------------------------------------------------------------|
+| namespace <br/> string | The namespace.                                                   |
+| network <br/> string   | The Harvester VM Network in the format `namespace/network-name`. |
+
+## Specifications
+
+1. You should be able to create a VM with any of the specified combinations of namespace and network.
+2. You should not be able to create a VM from any namespace or network that is in the settings, but the exact combination is not in the settings.
+3. Any namespace or network that is not on the settings is not restricted
+
+## Example
+
+```yaml
 apiVersion: policies.kubewarden.io/v1
 kind: ClusterAdmissionPolicy
 metadata:
   name: restricted-network-vm-policy-1
 spec:
-  module: harvester-restricted-network-vm:20
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/harvester-restricted-network-vm:latest
   rules:
     - apiGroups: ["kubevirt.io"]
       apiVersions: ["v1"]
       resources: ["virtualmachines"]
       operations: ["CREATE", "UPDATE"]
   settings:
-    namespaceNetworkBindings: 
+    namespaceNetworkBindings:
       - namespace: test-restricted-1-network-1
         network:  test-restricted-1-network-1/network-1
       - namespace: test-restricted-2-network-1
@@ -28,15 +50,9 @@ spec:
   policyServer: default
 ```
 
-**Specifications:**
+Here would be the result of the above policy.
 
-1. You should be able to create a VM with any of the specific combinations there
-2. You should not be able to create a VM from any namespace or network that is in that list, but the exact combination is not in the list.
-3. Any namespace or network that is not on the list is not restricted
-
-**Examples:**
-
-| namespace                   | network                               | Result |
+| Namespace                   | Network                               | Result |
 |-----------------------------|---------------------------------------|--------|
 | test-restricted-1-network-1 | test-restricted-1-network-1/network-1 | ALLOW  |
 | test-restricted-2-network-1 | test-restricted-1-network-1/network-1 | ALLOW  |

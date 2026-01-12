@@ -1,10 +1,41 @@
-# Kubewarden policy
+[![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
+[![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
 
-## Description
+# istio-gateway
 
-This policy will restrict the usage of the `Gateway` object configured on top of a dedicated instance of istio proxy only to `VirtualService` object coming from a set of namespaces.
+> [!NOTE]
+> This policy is meant to work with link:https://istio.io/[Istio], but not does not protect resources from its [Gateway API](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/) implementation.
 
-**Example policy:**
+This policy protects shared Istio Gateway resources by watching changes to VirtualService resources.
+For configured Gateway resources, it will ensure that VirtualService resources are correctly configured.
+
+## Settings
+
+| Field                                                                           | Description                                  |
+|---------------------------------------------------------------------------------|----------------------------------------------|
+| gatewayRestirctions <br/> map[string, [gatewayRestriction](#gatewayRestriction) | A list of Istio Gateway objects to restrict. |
+
+### GatewayRestriction
+
+| Field                                                | Description                 |
+|------------------------------------------------------|-----------------------------|
+| namespaces <br> map[string, [namespace](#namespace)] | A map of namespace objects. |
+
+### Namespace
+
+| Field                            | Description                                                                      |
+|----------------------------------|----------------------------------------------------------------------------------|
+| hostnames <br/> string[]         | A list of hostnames for the VirtualService.                                      |
+| port <br/> int                   | The port for the VirtualService. The default value 0 means any.                  |
+| protocol <br/> string            | The protocol for the VirtualService. The default value (empty string) means any. |
+| destination_hosts <br/> string[] | The destination hosts for the VirtualService.                                    |
+
+## Specifications
+
+1. You should be able to create a Gateway only on specific namespaces for specific hosts and destination_hosts if defined, otherwise the `*` wildcard will allow `all`.
+2. You should not be able to create a Gateway without specifying a valid namespace.
+
+## Example
 
 ```yaml
 apiVersion: policies.kubewarden.io/v1
@@ -12,7 +43,7 @@ kind: ClusterAdmissionPolicy
 metadata:
   name: istio-gw-policy-1
 spec:
-  module: harbor.op-prg2-0-dev-ingress.op.suse.org/policy-istio-gateway/policy-istio-gateway:0.1.0
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway:latest
   rules:
     - apiGroups: ["networking.istio.io"]
       apiVersions: ["v1"]
@@ -41,54 +72,4 @@ spec:
             destination_hosts: []
   mutating: false
   policyServer: default
-```
-
-**Specifications:**
-
-1. You should be able to create a Gateway only on specific namespaces for specific hosts and destination_hosts if defined, otherwise the `*` wildcard will allow `all`.
-2. You should not be able to create a Gateway without specifying a valid namespace.
-
-**Examples:**
-
-```json
-{
-  "gatewayRestrictions": {
-    "gateway-01": {
-      "ns-01": [
-        {
-          "hostnames": ["*"],
-          "destination_hosts": ["*"],
-          "port": 443,
-          "protocol": "https"
-        }
-      ]
-    },
-    "gateway-02": {
-      "ns-02": [
-        {
-          "hostnames": ["hostname a"],
-          "destination_hosts": ["servicename a", "servicename b"],
-          "port": 80,
-          "protocol": "http"
-        },
-        {
-          "hostnames": ["hostname b"],
-          "destination_hosts": ["servicename a", "servicename c"],
-          "port": 443,
-          "protocol": "https"
-          }
-      ]
-    },
-    "gateway-03": {
-      "ns-03": [
-        {
-          "hostnames": ["hostname a"],
-          "destination_hosts": ["*"],
-          "port": 443,
-          "protocol": "https"
-          }
-      ]
-    }
-  }
-}
 ```
