@@ -3,4 +3,4 @@ name-template: "istio-gateway/v$RESOLVED_VERSION"
 tag-template: "istio-gateway/v$RESOLVED_VERSION"
 tag-prefix: istio-gateway/v
 include-paths:
-  - "policies/istio-gateway/"
+  - "policies/istio-gateway-virtualservice/"

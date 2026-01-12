@@ -15,17 +15,17 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # artifacthub specific
-  io.artifacthub.displayName: Istio Gateway
+  io.artifacthub.displayName: Istio Gateway VirtualService
   io.artifacthub.resources: VirtualService
   io.artifacthub.keywords: virtualservice
   # kubewarden specific:
-  io.kubewarden.policy.title: istio-gateway
+  io.kubewarden.policy.title: istio-gateway-virtualservice
   io.kubewarden.policy.version: 0.1.0-rc1
   io.kubewarden.policy.description: Restrict the usage of the `Gateway` object configured on top of a dedicated instance of istio proxy only to `VirtualService` object coming from a set of namespaces.
   io.kubewarden.policy.author: "ITPE CORE Team <itpe-core-maintenance@suse.com>"
   io.kubewarden.policy.url: https://github.com/SUSE/openplatform-kubewarden-policies
-  io.kubewarden.policy.source: https://github.com/SUSE/openplatform-kubewarden-policies/tree/main/policies/istio-gateway
-  io.kubewarden.policy.ociUrl: ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway
+  io.kubewarden.policy.source: https://github.com/SUSE/openplatform-kubewarden-policies/tree/main/policies/istio-gateway-virtualservice
+  io.kubewarden.policy.ociUrl: ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway-virtualservice
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.severity: critical
   io.kubewarden.policy.category: Resource validation

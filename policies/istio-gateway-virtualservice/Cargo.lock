@@ -410,7 +410,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "istio-gateway"
+name = "istio-gateway-virtualservice"
 version = "0.1.0"
 dependencies = [
  "k8s-openapi",
