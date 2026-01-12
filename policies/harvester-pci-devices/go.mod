@@ -7,7 +7,7 @@ toolchain go1.23.1
 require (
 	github.com/francoispqt/onelog v0.0.0-20190306043706-8c2bb31b10a4
 	github.com/kubewarden/policy-sdk-go v0.11.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/wapc/wapc-guest-tinygo v0.3.3
 )
 
