@@ -1,7 +1,7 @@
 [![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
-[![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
+[![Incubating](https://img.shields.io/badge/status-incubating-orange?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#incubating)
 
-# istio-gateway
+# istio-gateway-virtualservice
 
 > [!NOTE]
 > This policy is meant to work with link:https://istio.io/[Istio], but not does not protect resources from its [Gateway API](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/) implementation.
@@ -11,9 +11,9 @@ For configured Gateway resources, it will ensure that VirtualService resources a
 
 ## Settings
 
-| Field                                                                           | Description                                  |
-|---------------------------------------------------------------------------------|----------------------------------------------|
-| gatewayRestirctions <br/> map[string, [gatewayRestriction](#gatewayRestriction) | A list of Istio Gateway objects to restrict. |
+| Field                                                                            | Description                                  |
+|----------------------------------------------------------------------------------|----------------------------------------------|
+| gatewayRestrictions <br/> map[string, [gatewayRestriction](#gatewayRestriction)] | A list of Istio Gateway objects to restrict. |
 
 ### GatewayRestriction
 
@@ -43,7 +43,7 @@ kind: ClusterAdmissionPolicy
 metadata:
   name: istio-gw-policy-1
 spec:
-  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway:latest
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/istio-gateway-virtualservice:latest
   rules:
     - apiGroups: ["networking.istio.io"]
       apiVersions: ["v1"]
