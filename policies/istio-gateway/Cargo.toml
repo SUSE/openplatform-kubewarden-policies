@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 k8s-openapi = { version = "0.26.0", default-features = false, features = [
   "v1_31",
 ] }
-kcr_networking_istio_io = "2.20251019.30658"
+kcr_networking_istio_io = "2.20260111.32906"
 kubewarden-policy-sdk = "0.15"
 lazy_static = "1.5"
 serde = { version = "1.0", features = ["derive"] }
