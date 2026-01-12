@@ -49,9 +49,9 @@ spec:
   policyServer: default
 ```
 
-Here would be the result of the above policy.
+The following examples are with the example policy above, with a random non-restricted VLAN being 100.
 
-| namespace         | VLAN ID | Result |
+| Namespace         | VLAN ID | Result |
 |-------------------|---------|--------|
 | test-restricted-1 | 42      | ALLOW  |
 | test-restricted-2 | 1337    | ALLOW  |

@@ -50,7 +50,7 @@ spec:
 
 Here would be the result of the above policy.
 
-| namespace        | PCI Device ID       | Result |
+| Namespace        | PCI Device ID       | Result |
 |------------------|---------------------|--------|
 | test-ns-1        | tekton27a-000001010 | ALLOW  |
 | test-ns-2        | tekton27b-000001010 | ALLOW  |

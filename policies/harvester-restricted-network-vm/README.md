@@ -52,7 +52,7 @@ spec:
 
 Here would be the result of the above policy.
 
-| namespace                   | network                               | Result |
+| Namespace                   | Network                               | Result |
 |-----------------------------|---------------------------------------|--------|
 | test-restricted-1-network-1 | test-restricted-1-network-1/network-1 | ALLOW  |
 | test-restricted-2-network-1 | test-restricted-1-network-1/network-1 | ALLOW  |
