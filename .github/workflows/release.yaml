@@ -199,3 +199,9 @@ jobs:
               prerelease: isPreRelease,
               make_latest: !isPreRelease
             });
+
+      - name: Publish to ArtifactHub
+        uses: ./.github/actions/push-artifacthub
+        with:
+          policy-working-dir: "${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}"
+          version: "${{ needs.calculate-policy-from-tag.outputs.policy-version }}"
