@@ -18,11 +18,12 @@ annotations:
   io.artifacthub.keywords: harvester, network
   # kubewarden specific:
   io.kubewarden.policy.title: harvester-restricted-network
-  io.kubewarden.policy.version: 0.1.0
+  io.kubewarden.policy.version: 0.1.0-rc1
   io.kubewarden.policy.description: Prevents harvester from creating a network for a restricted VLAN in unauthorized namespaces.
   io.kubewarden.policy.author: "ITPE Core Team <itpe-core-maintenance@suse.com>"
   io.kubewarden.policy.url: https://github.com/SUSE/openplatform-kubewarden-policies
   io.kubewarden.policy.source: https://github.com/SUSE/openplatform-kubewarden-policies/tree/main/policies/harvester-restricted-network
+  io.kubewarden.policy.ociUrl: ghcr.io/suse/openplatform-kubewarden-policies/harvester-restricted-network-vm
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.severity: critical
   io.kubewarden.policy.category: Resource validation
