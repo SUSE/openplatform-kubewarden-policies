@@ -18,7 +18,7 @@ annotations:
   io.artifacthub.keywords: harvester, virtualmachine, pci
   # kubewarden specific:
   io.kubewarden.policy.title: harvester-pci-devices
-  io.kubewarden.policy.version: 0.1.0-rc1
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.description: Prevents libvirt from binding pci devices in the wrong namespaces.
   io.kubewarden.policy.author: "ITPE CORE Team <itpe-core-maintenance@suse.com>"
   io.kubewarden.policy.url: https://github.com/SUSE/openplatform-kubewarden-policies
