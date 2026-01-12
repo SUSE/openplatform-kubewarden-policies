@@ -3,6 +3,8 @@
 
 # harvester-pci-devices
 
+This policy guards against VMs attaching PCI Devices (e.g., GPUs) without permission.
+
 ## Settings
 
 | Field                                                                                      | Description                             |

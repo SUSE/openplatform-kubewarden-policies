@@ -3,6 +3,8 @@
 
 # harvester-restricted-network-vm
 
+This policy protects Harvester VM networks, by specifying which namespaces are allowed.
+
 ## Settings
 
 | Field                                                                                          | Description                          |

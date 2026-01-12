@@ -3,6 +3,8 @@
 
 # harvester-restricted-network
 
+This policy guards against harvester creating a network for a restricted VLAN in unauthorized namespaces.
+
 ## Settings
 
 | Field                                                                                 | Description                       |
