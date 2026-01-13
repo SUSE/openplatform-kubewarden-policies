@@ -20,7 +20,7 @@ annotations:
   io.artifacthub.keywords: pod
   # kubewarden specific:
   io.kubewarden.policy.title: pod-mig-partitions
-  io.kubewarden.policy.version: 0.1.0-rc1
+  io.kubewarden.policy.version: 0.1.0
   io.kubewarden.policy.description: Prevents assigning mig partitions without a ResourceQuota for them.
   io.kubewarden.policy.author: "ITPE CORE Team <itpe-core-maintenance@suse.com>"
   io.kubewarden.policy.url: https://github.com/SUSE/openplatform-kubewarden-policies
