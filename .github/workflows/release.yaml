@@ -212,6 +212,9 @@ jobs:
         with:
           fetch-depth: 0 # fetch all history for all branches and tags
 
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
       - name: Publish to ArtifactHub
         uses: ./.github/actions/push-artifacthub
         with:
