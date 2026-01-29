@@ -16,7 +16,7 @@ jobs:
         uses: ./.github/actions/get-policy-metadata
         with:
           policy-working-dir: "${{ inputs.policy-working-dir }}"
-      - uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
+      - uses: release-drafter/release-drafter@6db134d15f3909ccc9eefd369f02bd1e9cffdf97 # v6.2.0
         with:
           config-name: "release-drafter-${{ steps.policy-info.outputs.policy-basename }}.yml"
           prerelease: ${{ contains(steps.policy-info.outputs.policy-version, '-alpha') || contains(steps.policy-info.outputs.policy-version, '-beta') || contains(steps.policy-info.outputs.policy-version, '-rc') }}
