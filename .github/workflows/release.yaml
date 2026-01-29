@@ -15,7 +15,7 @@ jobs:
       policy-id: ${{ steps.policy-info.outputs.policy-id }}
       policy-name: ${{ steps.policy-info.outputs.policy-basename }}
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Calculate Policy
         id: calculate-policy
         shell: bash
@@ -41,7 +41,7 @@ jobs:
     needs: [calculate-policy-from-tag]
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Check that `io.kubewarden.policy.version` annotation is up-to-date
         shell: bash
@@ -65,7 +65,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies
@@ -208,7 +208,7 @@ jobs:
       group: ${{ github.workflow }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # fetch all history for all branches and tags
 
