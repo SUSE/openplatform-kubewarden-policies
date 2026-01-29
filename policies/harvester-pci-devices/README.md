@@ -32,7 +32,7 @@ kind: ClusterAdmissionPolicy
 metadata:
   name: harvester-pci-policy-1
 spec:
-  module: harbor.op-prg2-0-dev-ingress.op.suse.org/op-portal/kubewarden-policy:20
+  module: registry://ghcr.io/suse/openplatform-kubewarden-policies/harvester-pci-devices:latest
   rules:
     - apiGroups: ["kubevirt.io"]
       apiVersions: ["v1"]
@@ -44,7 +44,7 @@ spec:
         device:  tekton27a-000001010
       - namespace: test-ns-2
         device:  tekton27b-000001010
-  mutating: false  # or true if your policy mutates resources
+  mutating: false
   policyServer: default
 ```
 
