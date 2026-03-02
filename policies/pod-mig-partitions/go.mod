@@ -1,12 +1,10 @@
 module github.com/SUSE/openplatform-kubewarden-policies/policies/pod-mig-partitions
 
-go 1.22
-
-toolchain go1.24.6
+go 1.25
 
 require (
 	github.com/kubewarden/k8s-objects v1.32.0-kw1
-	github.com/kubewarden/policy-sdk-go v0.12.0
+	github.com/kubewarden/policy-sdk-go v0.13.1
 	github.com/stretchr/testify v1.11.1
 )
 
