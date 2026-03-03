@@ -9,7 +9,7 @@ GOLANGCI_LINT := $(BIN_DIR)/$(GOLANGCI_LINT_BIN)
 policy.wasm:
 # CI is a environment variable set in the GitHub Actions workflow.
 # If we are running in CI, we assume TinyGo is already installed.
-ifeq ($(CI),true)
+ifeq ($(CI),$(GITHUB_ACTIONS),true, true)
 	tinygo build -o policy.wasm -target=wasi -no-debug ./cmd
 else
 	podman run \

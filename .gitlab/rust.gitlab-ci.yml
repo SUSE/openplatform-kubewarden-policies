@@ -1,0 +1,25 @@
+include:
+  - '/.gitlab/templates/kubewarden.gitlab-ci.yml'
+
+stages:
+  - build
+  - upload
+
+image:
+  name: registry.opensuse.org/isv/suseinfra/itpe/images/images/gitlab-runner-rust-1.93:latest
+
+build_rust:
+  extends:
+    - .kubewarden_build
+
+#push_gitlab:
+#  extends:
+#    - .kubewarden_upload_gitlab
+#  needs:
+#    - build_rust
+
+push_harbor:
+  extends:
+    - .kubewarden_upload_harbor
+  needs:
+    - build_rust

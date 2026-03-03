@@ -1,0 +1,26 @@
+image:
+  name: "registry.opensuse.org/isv/suseinfra/itpe/images/images/gitlab-runner-base:latest"
+
+.kubewarden_build:
+  stage: build
+  script:
+    - make -C ${POLICY_WORKING_DIR} policy.wasm
+    - make -C ${POLICY_WORKING_DIR} annotated-policy.wasm
+  artifacts:
+    paths:
+      - ${POLICY_WORKING_DIR}/annotated-policy.wasm
+
+#.kubewarden_upload_gitlab:
+#  stage: upload
+#  script:
+#    - echo "$CI_DEPLOY_PASSWORD" | podman login --authfile=auth.json ${CI_REGISTRY} -u ${CI_DEPLOY_USER} --password-stdin
+#    - mv auth.json config.json
+#    - kwctl push --docker-config-json-path=`pwd` ${POLICY_WORKING_DIR}/annotated-policy.wasm ${CI_REGISTRY}/${CI_PROJECT_PATH}/${POLICY_BASENAME}:${POLICY_VERSION}
+
+.kubewarden_upload_harbor:
+  stage: upload
+  script:
+    - echo "hello world!"
+    - echo "$HARBOR_PASSWORD" | podman login --authfile=auth.json ${HARBOR_DNS} -u ${HARBOR_USERNAME} --password-stdin
+    - mv auth.json config.json
+    - kwctl push --docker-config-json-path=`pwd` ${POLICY_WORKING_DIR}/annotated-policy.wasm ${HARBOR_DNS}/${HARBOR_PROJECT}/${POLICY_BASENAME}:${POLICY_VERSION}

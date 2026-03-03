@@ -1,0 +1,25 @@
+include:
+  - '/.gitlab/templates/kubewarden.gitlab-ci.yml'
+
+stages:
+  - build
+  - upload
+
+image:
+  name: registry.opensuse.org/isv/suseinfra/itpe/images/images/gitlab-runner-go-1.25:latest
+
+build_go:
+  extends:
+    - .kubewarden_build
+
+#push_gitlab:
+#  extends:
+#    - .kubewarden_upload_gitlab
+#  needs:
+#    - build_go
+
+push_harbor:
+  extends:
+    - .kubewarden_upload_harbor
+  needs:
+    - build_go
