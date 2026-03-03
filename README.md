@@ -9,3 +9,7 @@ This is a collection of Kubewarden policies that SUSE's ITPE Core Platform team 
 * [harvester-restricted-network-vm](policies/harvester-restricted-network-vm)
 * [istio-gateway-virtualservice](policies/istio-gateway-virtualservice)
 * [pod-mig-partitions](policies/pod-mig-partitions)
+
+## Procedures
+
+1. [Releasing a policy](docs/release.md).
