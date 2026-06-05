@@ -460,9 +460,9 @@ dependencies = [
 
 [[package]]
 name = "kcr_networking_istio_io"
-version = "3.20260118.32604"
+version = "3.20260531.60249"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edf24e7f1d8468ca9951eb20f143869f1bb1bd8255007ebe3d68457b531414ed"
+checksum = "fdfae77f7f37726d85edfbfe2351e85679470c85eabd5f16f4a2d621ab76d846"
 dependencies = [
  "k8s-openapi",
  "kube",
