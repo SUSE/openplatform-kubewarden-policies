@@ -406,7 +406,7 @@ dependencies = [
 name = "istio-gateway-virtualservice"
 version = "0.1.0"
 dependencies = [
- "k8s-openapi",
+ "k8s-openapi 0.27.1",
  "kcr_networking_istio_io",
  "kubewarden-policy-sdk",
  "lazy_static",
@@ -459,12 +459,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "k8s-openapi"
+version = "0.28.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9c6922f6afe80418dd6019818af5d0d34584c371780ff09b9752370c25b4abb"
+dependencies = [
+ "base64",
+ "jiff",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "kcr_networking_istio_io"
 version = "3.20260118.32604"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "edf24e7f1d8468ca9951eb20f143869f1bb1bd8255007ebe3d68457b531414ed"
 dependencies = [
- "k8s-openapi",
+ "k8s-openapi 0.27.1",
  "kube",
  "schemars",
  "serde",
@@ -477,7 +489,7 @@ version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f96b537b4c4f61fc183594edbecbbefa3037e403feac0701bb24e6eff78e0034"
 dependencies = [
- "k8s-openapi",
+ "k8s-openapi 0.27.1",
  "kube-core",
  "kube-derive",
 ]
@@ -492,7 +504,7 @@ dependencies = [
  "form_urlencoded",
  "http",
  "jiff",
- "k8s-openapi",
+ "k8s-openapi 0.27.1",
  "schemars",
  "serde",
  "serde-value",
@@ -516,14 +528,14 @@ dependencies = [
 
 [[package]]
 name = "kubewarden-policy-sdk"
-version = "0.17.0"
+version = "0.17.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2ae4e00b1dfe10c84e2246b2402da8b3709fee3bfa1bafbd7fa86b70a583871"
+checksum = "8fe472cdc6565b1aaf89d0a3e931f91cb26652066fc7e086d50872d0af9dab5b"
 dependencies = [
  "cfg-if",
  "chrono",
  "hex",
- "k8s-openapi",
+ "k8s-openapi 0.28.0",
  "num",
  "num-derive",
  "num-traits",
@@ -662,9 +674,9 @@ dependencies = [
 
 [[package]]
 name = "oci-spec"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8445a2631507cec628a15fdd6154b54a3ab3f20ed4fe9d73a3b8b7a4e1ba03a"
+checksum = "3df6f876ad774d6a676f7e968f5c3edacc32f90e65fe680a8b686235396556fb"
 dependencies = [
  "const_format",
  "derive_builder",
