@@ -1,4 +1,4 @@
-_extends: openplatform-kubewarden-policies:.github/release-drafter.yml
+_extends: openplatform-kubewarden-policies:release-drafter.yml
 name-template: "harvester-pci-devices/v$RESOLVED_VERSION"
 tag-template: "harvester-pci-devices/v$RESOLVED_VERSION"
 tag-prefix: harvester-pci-devices/v
